@@ -32,32 +32,20 @@ def load_data():
 
 
 def get_df_icf_matrix(X_t, Y_c):
-    # Calculating tf(c,d)
-    tf = {}
-    for i in range(len(X_t)):
-        doc_dict = {}
-        for word in X_t[i].split():
-            if word not in doc_dict:
-                doc_dict[word] = 1
-            else:
-                doc_dict[word] += 1
-        tf[i] = doc_dict
-    
-    # Calculating df(t,c)
-    df={}
+    # Calculating Term frequency
+    tf={}
     for i in range(len(X_t)):
         category = Y_c[i]
         for word in X_t[i].split():
-            if word not in df:
-                df[word] = {}
+            if word not in tf:
+                tf[word] = {}
                 
-            if category not in df[word]:
-                df[word][category] = 1
+            if category not in tf[word]:
+                tf[word][category] = 1
             else:
-                df[word][category] += 1
-    
-    # 
-    return tf, df
+                tf[word][category] += 1
+
+    return tf
 
 if __name__ == "__main__":
     X_train, y_train, X_test, y_test = load_data()
