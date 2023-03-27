@@ -1,0 +1,64 @@
+We are implementing a TF-ICF Naive Bayes Polynomial Classifier in this question:
+
+This classifier is classifying documents in their categories after training the model on the training set, 
+which we create by splitting the initial data into 70-30 ratio or as specified.
+
+First we preprocess the data, in which we remove the stopwords, performed tokenization, removed the 'ArticleId' column.
+Then we implement the TF-ICF weighing scheme by iterating over the training data.
+TF is number of occurrences of a term in all documents of a particular class,
+CF is number of classes in which a term occurs, ICF is log(Total number of classes / CF)
+
+Then we train the model on the training data, get the tf-icf data, category probabilities for each category, 
+build our vocabulary, get the feauture probability array for each category.
+
+Then we test our model on the test data we get after splitting, to predict categories of the documents in test data. We do this by 
+getting the maximum class/category score for the document which we have to predict the class/category for. Category score is
+calculated by multiplying the category probability with tf*icf score for each word in test document for each category.
+
+We finally evaluate our classifier by getting the accuracy, precision, recall, f1 score
+through scikit library
+
+We get :
+Number of accurate predictions: 422 out of  447
+accuracy as  94.40715883668904
+precision in the range of 0.91 to 0.979 for each category
+for categories:
+	['business', 'entertainment','politics', 'sport','tech']
+recall: [0.93877551 0.80769231 0.98780488 0.99029126 0.97674419]
+fscore: [0.96335079 0.89361702 0.97005988 0.99512195 0.88421053]
+
+Then we experiment with our model in hope of improving the classifier.
+1. Instead of storing counts of individual words in tf matrix and other arrays we use bigrams from training data and their counts/probabilities.
+
+Number of correct category predictions:  152  out of  447
+This gives an accuracy of 34.00447427293065, hence performs worse. We also get zero division error in getting recall and f score of categories.
+	['business', 'entertainment','politics', 'sport','tech']
+recall: [0.22018349 0.         0.47619048 0.03030303 1.        ]
+fscore: [0.35820896 0.         0.52980132 0.05882353 0.38901602]
+
+2. In another method, we calculate and add category score for a word in testing only when a numpy.random.random()
+returns more than 0.1, and 0 otherwise. 
+
+Number of correct category predictions:  83  out of  447
+accuracy: 18.568232662192393
+precision is in the range of 0.18 to 0.25 for different categories
+	['business', 'entertainment','politics', 'sport','tech']
+recall: [0.1980198  0.1369863  0.16666667 0.1981982  0.21794872]   
+fscore: [0.20942408 0.12269939 0.16091954 0.2244898  0.2       ]  
+
+3. In this method, scores of each category are multiplied (hence, without taking log of tf*icf). Also, if word is not present in training vocabulary, 
+instead of adding 0 to category score, we add 0.5. Also we add the cateogory probability to tf of word before multiplying it with icf.
+This performs a bit better.
+
+Number of correct category predictions:  241  out of  447
+accuracy: 53.914988814317674
+precision varies from 0.3 to 0.6 for different categories
+	['business', 'entertainment','politics', 'sport','tech']
+recall: [0.35294118 0.56578947 0.17333333 0.58333333 1.        ]
+fscore: [0.51428571 0.7107438  0.27083333 0.73684211 0.46994536]
+
+4. We can also change the train-test split from data, in the main file while loading the data by changing the 'splitfrac' parameter.
+When this parameter is reduced, like 20-80 train-test, accuracy is reduced drastically and increasing to 90-10 train-test increases the accuracy as well.
+
+Thus we see, the simple TF-ICF Naive Bayes classifier with word frequencies outperforms any other modification.
+
